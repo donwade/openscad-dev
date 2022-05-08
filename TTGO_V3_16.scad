@@ -6,7 +6,7 @@ thick = 1.27;
 mount_hole_center_x = 2.40;
 mount_hold_center_y = 3.25;
 mount_hole_diameter = 1.87;
-punch_out = 15;
+punch_out = 30;
 
 antenna_center_x = 14.34 - 1.53 ;
 antenna_box_x = 11.60;
@@ -75,7 +75,7 @@ module makeTTGO( x, y, z, rx, ry, rz)
 
             // the cylinder that comes out of the box
             board_to_thread = 3.65;
-            translate([x + antenna_box_x + antenna_box_width/2, y , z - board_to_thread - sma_male_dia_AF/2])
+            translate([x + antenna_box_x + antenna_box_width/2, y - antenna_box_width , z - board_to_thread - sma_male_dia_AF/2])
             rotate([90,0,0])
             CYLINDER(height=punch_out, radius = sma_male_dia_AF/2 , center = true);
             
@@ -113,7 +113,7 @@ module makeTTGO( x, y, z, rx, ry, rz)
             virtcard_width = 11.2;
             color("Fuchsia",.5 )
             translate([x -virtcard_length, y + SD_carrier_y, z +thick + SD_carrier_thickness - SD_card_thickness - tweek])  // SD card sits below top of carrier
-            CUBE([virtcard_length, virtcard_width, SD_card_thickness], center = false);
+            cube([virtcard_length, virtcard_width, SD_card_thickness], center = false);
             
             // virtual USB power adapter
             color("Cyan",.25)

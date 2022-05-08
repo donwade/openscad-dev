@@ -1,6 +1,6 @@
 use</home/dwade/openscad-dev/TTGO_V3_16.scad>;
 
-bHasLid = 1;
+bHasLid = 0;
 bHasPosts = 0;
 bHasSideCrossSection = 0;
 bHasCrossSectionFront = 1;  //1=show usb side 0= show SD card side
@@ -11,7 +11,7 @@ bHasTopCrop = 0;
 width  = 77;    //x dimension
 length = 45;    //y dimension
 height = 25;    //z dimension
-$fn=50;
+$fn=100;
 
 //additional parameters
 corner_radius = 5;      // radius of box corners
@@ -127,7 +127,7 @@ if (bHasPosts)
     }
 }
 
-hold_down_height = 14;
+hold_down_height = 14 - 1.58;
 hold_down_dia = 10;
 
 if (bHasLid)
