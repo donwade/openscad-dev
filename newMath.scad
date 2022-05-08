@@ -1,4 +1,4 @@
-abs_tweek = 1;
+abs_tweek = .75;
 
 
 module CYLINDER(height=1,radius=1, center = true)

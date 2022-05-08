@@ -9,7 +9,8 @@ mount_hole_diameter = 1.87;
 punch_out = 15;
 
 antenna_center_x = 14.34 - 1.53 ;
-antenna_box_x = 6.31;
+antenna_box_x = 11.60;
+antenna_box_width = 6.19;
 sma_male_dia_AF = 9;
 
 small_adj = 1;
@@ -68,16 +69,18 @@ module makeTTGO( x, y, z, rx, ry, rz)
             cube([length, width, thick], center = false);
             
             // the rectangular box the antenna sits on
-            translate([x + antenna_center_x - antenna_box_x/2 , y, z -6.0])
-            cube([6.32, 6.32, 6.0], center = false);
+            color("GREY")
+            translate([x + antenna_box_x , y, z -6.0])
+            cube([antenna_box_width, antenna_box_width, 6.0], center = false);
 
             // the cylinder that comes out of the box
-            translate([x + antenna_center_x, y - punch_out/2, z - 5 - 2.30])
+            board_to_thread = 3.65;
+            translate([x + antenna_box_x + antenna_box_width/2, y , z - board_to_thread - sma_male_dia_AF/2])
             rotate([90,0,0])
             CYLINDER(height=punch_out, radius = sma_male_dia_AF/2 , center = true);
             
             // SD card carrier
-            translate([x, y + SD_carrier_y, z + thick])
+            translate([x, y + SD_carrier_y, z + thick ])
             CUBE([6.45, SD_carrier_width, SD_carrier_thickness], center = false);
      
             // USB carrier
@@ -105,9 +108,12 @@ module makeTTGO( x, y, z, rx, ry, rz)
             cylinder(h=punch_out *2, d= mount_hole_diameter, center = false); 
 
             // virtual SD card 
+            tweek = .2; // card does NOT plug into metal edge
+            virtcard_length = 10.1;
+            virtcard_width = 11.2;
             color("Fuchsia",.5 )
-            translate([x -10.1, y + 1.91, z +thick + SD_carrier_thickness - SD_card_thickness])  // SD card sits below top of carrier
-            CUBE([10.1, 11.2, SD_card_thickness], center = false);
+            translate([x -virtcard_length, y + SD_carrier_y, z +thick + SD_carrier_thickness - SD_card_thickness - tweek])  // SD card sits below top of carrier
+            CUBE([virtcard_length, virtcard_width, SD_card_thickness], center = false);
             
             // virtual USB power adapter
             color("Cyan",.25)

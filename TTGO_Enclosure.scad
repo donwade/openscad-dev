@@ -1,21 +1,21 @@
 use</home/dwade/openscad-dev/TTGO_V3_16.scad>;
 
-bHasLid = 0;
+bHasLid = 1;
 bHasPosts = 0;
-bHasSideCrossSection = 1;
+bHasSideCrossSection = 0;
 bHasCrossSectionFront = 1;  //1=show usb side 0= show SD card side
 
 bHasTopCrop = 0;
 
 //outside dimensions of the box
-width  = 75;    //x dimension
-length = 50;    //y dimension
+width  = 77;    //x dimension
+length = 45;    //y dimension
 height = 25;    //z dimension
 $fn=50;
 
 //additional parameters
 corner_radius = 5;      // radius of box corners
-wall_thickness = 4;     // total thickness of any wall
+wall_thickness = 5;     // total thickness of any wall
 post_diameter = 10;     // internal post for screws
 hole_diameter = 3;      // size of screws for lid (0=no screws)
 lid_thickness= 2;       // comment out if no lid required
@@ -80,7 +80,7 @@ difference()
         }
         
         //makeTTGO(-width/2, 0,0, -180, 0, 0);
-        #makeTTGO(-width + 43, -length/3 +3,  0 - 7.8, -180, 0, 0);
+        #makeTTGO(-width + 43, -length/3 +3,  0 - 7.0, -180, 0, 0);
     }  // box is fully formed
     
     if (bHasSideCrossSection)
@@ -166,8 +166,9 @@ if (bHasLid)
            
         }
         // add post on lid to hold down card.
-        translate([10 , 0, lid_thickness])
-        #cylinder(h=hold_down_height, d=hold_down_dia, center = false);  
+        translate([length/2 - 14 - 6 , -2, lid_thickness])
+        cylinder(h=hold_down_height, d1=hold_down_dia, d2=1, center=false);
+        //#cylinder(h=hold_down_height, d=hold_down_dia, center = false);   
     }
 }
 
