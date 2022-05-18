@@ -74,7 +74,7 @@ module makeTTGO( x, y, z, rx, ry, rz)
             cube([antenna_box_width, antenna_box_width, 6.0], center = false);
 
             // the cylinder that comes out of the box
-            board_to_thread = 3.65;
+            board_to_thread = 2.4;
             translate([x + antenna_box_x + antenna_box_width/2, y - antenna_box_width , z - board_to_thread - sma_male_dia_AF/2])
             rotate([90,0,0])
             CYLINDER(height=punch_out, radius = sma_male_dia_AF/2 , center = true);
