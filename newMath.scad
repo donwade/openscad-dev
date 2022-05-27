@@ -1,5 +1,9 @@
-abs_tweek = .75;
+oversize_mm = 1;
+echo ("********************************");
+echo ("newMath.scad oversize_mm set to ", oversize_mm);
+echo ("********************************");
 
+//------------------------------------------------------------------------
 
 module CYLINDER(height=1,radius=1, center = true)
 {
@@ -9,7 +13,7 @@ module CYLINDER(height=1,radius=1, center = true)
         cylinder(h = height, r = radius, center = true);
  
         color("VIOLET", .2)
-        cylinder(h = height, r = radius + abs_tweek/2, center = true);
+        cylinder(h = height, r = radius + oversize_mm/2, center = true);
     }
     else
     {
@@ -19,15 +23,16 @@ module CYLINDER(height=1,radius=1, center = true)
 
         color("VIOLET", .2)
         translate([radius, radius, 0])
-        cylinder(h = height, r = radius + abs_tweek/2, center = false);
+        cylinder(h = height, r = radius + oversize_mm/2, center = false);
     }
 }
 
-
+//------------------------------------------------------------------------
 module CUBE(size, center = true)
 {
-    cube(size + abs_tweek_mm, center);
+    cube(size + oversize_mm_mm, center);
 }
+//------------------------------------------------------------------------
 
 module CUBE(dimension = [0 , 0, 0], center = true)
 {
@@ -39,7 +44,7 @@ module CUBE(dimension = [0 , 0, 0], center = true)
 
         // the adjusted size
         color("BLUE", .2)
-        cube([dimension[0] + abs_tweek, dimension[1] + abs_tweek, dimension[2] + abs_tweek], center);
+        cube([dimension[0] + oversize_mm, dimension[1] + oversize_mm, dimension[2] + oversize_mm], center);
     }
     else
     {
@@ -49,11 +54,31 @@ module CUBE(dimension = [0 , 0, 0], center = true)
 
         // the adjusted size
         color("BLUE", .2)
-        translate([-abs_tweek/2, -abs_tweek/2, -abs_tweek/2])
-        cube([dimension[0] + abs_tweek, dimension[1] + abs_tweek, dimension[2] + abs_tweek], center = false);
+        translate([-oversize_mm/2, -oversize_mm/2, -oversize_mm/2])
+        cube([dimension[0] + oversize_mm, dimension[1] + oversize_mm, dimension[2] + oversize_mm], center = false);
     }
 }
 
+//------------------------------------------------------------------------
+module SHIM(shim_width, shim_len, shim_degrees = 45, shim_origin = 0)
+{
+    // shim origin = 0 narrow point,  !=0 highest part
+    translate([0, shim_origin ? -shim_len : 0, 0])
+    difference ()
+    {
+        cube([shim_width, shim_len, max(shim_width, shim_len) ]);
+
+        union()
+        {
+            // cut the incline, ensure mathmatically FULLY cut
+            rotate([shim_degrees,0, 0 ])
+            #cube([shim_width, sqrt(2*(shim_len * shim_len)), shim_len * 1]);
+        }
+    }
+}
+
+translate([150, 0, 0])
+SHIM(25, 100, 30, 0);  // 25 wide 100 long 30 degrees
 
 //CUBE(10, center = false);
 
