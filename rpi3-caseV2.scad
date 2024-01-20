@@ -11,7 +11,7 @@
 /* [Main] */
 
 // Which part to render
-part = "print"; // [ lid: Lid, base: Base, both: Box, print: print ]
+part = "lid"; // [ lid: Lid, base: Base, both: Box, print: print ]
 
 // Make slot for the camera cable
 camera_slot = "false"; // [ true: Yes, false: No ]
@@ -101,26 +101,17 @@ bolt_crest_diameter=1.9;
 bolt_countersink =  bolt_crest_diameter *2;
 bolt_length = 5.5;
 
-/*
 
-antenna_mount= 6.58;
-antenna_fudgeX = 14.5;  //16.0; com'n they couldnt center 2 antennas on the board center? :(
-antenna_center_X = antenna_fudgeX - antenna_mount / 2;
+antenna_sma_male = 6.29 + 1;
+antenna_sma_female = 12.16 + 1; // no shround 9.2 + 2;  // too tight. 
 
-antenna_fudgeY = 9.36;
-antenna_center_Y = antenna_fudgeY - antenna_mount / 2;
-*/
+ant_left_y = 11.95 - antenna_sma_male/2;  //  from the outside wall
+ant_left_x = 18.20 - antenna_sma_male/2;  //  from the outside wall
 
-antenna_sma_male = 6.29;
-antenna_sma_female = 9.2 + 2;  // too tight. 
+ant_right_y = 13.22 - antenna_sma_male/2;  //  from the outside wall
+ant_right_x = 19.32 - antenna_sma_male/2;  //  from the outside wall
 
-ant_left_y = 6.44;   // from the inside top wall
-ant_left_x = 12.26;  // from the inide left wall
-
-ant_right_y = 6.95;  // from the inside top wall
-ant_right_x = 13.77; // from the inside right wall
-
-$fn=60;
+$fn=30;
 
 //base();
 //lid();
@@ -290,6 +281,91 @@ module musb_hole(padding=0.6, extends=5, outer_padding=2) {
     }
 }
 
+module MMDVM_remove()
+{
+    // drop in the dual antennas
+    translate ([ box_outside_width  - ant_right_x,
+                 box_outside_length - ant_right_y, 
+                 box_outside_heigth - thick_vert_wall - .1 ]) //go thru ceiling
+            cylinder(h = 10, d =antenna_sma_female);
+
+    translate ([                       ant_left_x,
+                 box_outside_length -  ant_left_y,
+                 box_outside_heigth - thick_vert_wall - .1]) //go thru ceiling
+            cylinder(h = 10, d =antenna_sma_female);
+
+/*
+    // pretty recessed version.
+    // drop in the dual antennas
+    translate ([ box_outside_width  - ant_right_x,
+                 box_outside_length - ant_right_y, 
+                 box_outside_heigth - thick_vert_wall + 1 ]) // almost go thru ceiling
+            cylinder(h = 10, d =antenna_sma_female);
+
+    translate ([                       ant_left_x,
+                 box_outside_length -  ant_left_y,
+                 box_outside_heigth - thick_vert_wall + 1 ]) //almost go thru ceiling
+            cylinder(h = 10, d =antenna_sma_female);
+
+    // drop in the dual antennas
+    translate ([ box_outside_width  - ant_right_x,
+                 box_outside_length - ant_right_y, 
+                 box_outside_heigth - thick_vert_wall -1]) // go thru ceiling
+            cylinder(h = 10, d =antenna_sma_male);
+
+    translate ([                       ant_left_x,
+                 box_outside_length -  ant_left_y,
+                 box_outside_heigth - thick_vert_wall -1 ]) //go thru ceiling
+            cylinder(h = 10, d =antenna_sma_male);
+*/            
+    // LCD screen
+    translate ([                     18.41 , 
+                box_outside_length - 30.33 ,
+                box_outside_heigth - thick_vert_wall - .1])
+            cube ([27.4 -1.6, 14, 30]);
+
+    // protocol LEDS - light pipes punch holes in roof
+    led_spacing = 15.0 / (9 -1);  // nine leds ... how many fences?
+    for (i = [0:1:9]) 
+    {
+        translate ( [ box_outside_width - 13.06 - i * led_spacing,
+                                          29.00,
+                      box_outside_heigth +1 ])
+                rotate([180, 0, 0])
+                    cylinder(h = 3.8 + thick_vert_wall +8, d=1 );
+                    //cube ([.7,3,4]);
+    }    
+            
+}
+
+module MMDVM_add()
+{
+    led_spacing = 15.0 / (9 -1);  // nine leds ... how many fences?
+    difference()
+    {
+        // protocol LEDS light pipes
+        for (i = [0:1:9]) 
+        {
+            translate ( [ box_outside_width - 13.06 - i * led_spacing,
+                                              29.00,
+                          box_outside_heigth - thick_vert_wall ])
+                    rotate([180, 0, 0])
+                        cylinder(h = 3.8, d=2 );
+                        //cube ([.7,3,4]);
+        }
+
+        // protocol LEDS light pipes
+        for (i = [0:1:9]) 
+        {
+            translate ( [ box_outside_width - 13.06 - i * led_spacing,
+                                              29.00,
+                          box_outside_heigth - 3 ])
+                    rotate([180, 0, 0])
+                        cylinder(h = 3.8 + thick_vert_wall +8, d=1 );
+                        //cube ([.7,3,4]);
+        }    
+    }
+}
 
 module box() {
 
@@ -379,18 +455,18 @@ module box() {
         }
 
         // Cooling always
-        translate([pi3_homeX + 16, pi3_homeY + 18, thick_horz_wall + pi3_tophat_height]) {
-            translate([12, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
-            translate([-6, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
-            translate([0, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2, 20);
-            translate([6, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
-            translate([12, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
+        translate([pi3_homeX + 16, pi3_homeY + 30, thick_horz_wall + pi3_tophat_height]) {
+            translate([12, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
+            translate([-6, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
+            translate([0, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2, 20);
+            translate([6, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
+            translate([12, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
             
             if (gpio_slot == "true") {
                translate([24, 0, 0]) rotate([0, 0, 45]) roundeheadd_slot(22.5/2, 2.95, 20);
             } else {
-               translate([18, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
-               translate([24, 0, 0]) rotate([0, 0, 45]) rounded_slot(22.5, 2., 20);
+               translate([18, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
+               translate([24, 0, 0]) rotate([0, 0, 45]) rounded_slot(10.5, 2., 20);
             }
 
         }
@@ -419,37 +495,12 @@ module box() {
                     translate([42, 0, 0]) rotate([0, 0, 125]) rounded_slot(15.5, 2., 20);
                 }
             }
-
-            // drop in the dual antennas
-            translate ([ box_outside_width  - thick_horz_wall - ant_right_x,
-                         box_outside_length - thick_horz_wall - ant_right_y, 
-                         box_outside_heigth - thick_vert_wall - 3 ])
-                    cylinder(h = 10, d =antenna_sma_female);
- 
-            translate ([                      thick_horz_wall + ant_left_x,
-                         box_outside_length - thick_horz_wall - ant_left_y,
-                         box_outside_heigth - thick_vert_wall - 3 ])
-                    cylinder(h = 10, d =antenna_sma_female);
-
-            // LED screen
-            translate ([                     18.41 , 
-                        box_outside_length - 30.33 ,
-                        box_outside_heigth - thick_vert_wall - 3])
-                    cube ([27.4 -1.6, 14, 30]);
-        }   
+        }
+        MMDVM_remove();
+   
     }
-    /* debug
-    // drop in the dual antennas
-    translate ([ box_outside_width  - thick_horz_wall - ant_left_x,
-                 box_outside_length - thick_horz_wall - ant_left_y, 
-                 box_outside_heigth - thick_vert_wall ])
-            cylinder(h = thick_vert_wall, d =antenna_sma_female);
-
-    translate ([                      thick_horz_wall + ant_right_x,
-                 box_outside_length - thick_horz_wall - ant_right_y,
-                 box_outside_heigth - thick_vert_wall ])
-            cylinder(h = thick_vert_wall, d =antenna_sma_female);
-    */
+    //MMDVM_remove();
+    MMDVM_add()
 
     // SD card slot support (the one on the base)
     // We assume the slot is "almost" centered
@@ -498,7 +549,7 @@ module lid() {
                 cube([_sd_width, thick_vert_wall * 2, box_outside_heigth - pi3_homeZ ]);
 
             // Standoffs -----------------------------------
-            translate([0, 0, pi3_homeZ + pi3_board_thickness + 0.5]) {
+            translate([0, 0, pi3_homeZ + pi3_board_thickness - thick_vert_wall]) {
                 translate([pi3_homeX + pi3_hole_offset, pi3_homeY + pi3_hole_y2, 0])
                 {
                     hull() {
@@ -573,26 +624,26 @@ module lid() {
         
             translate([pi3_hole_x1, pi3_hole_y2, 0])
             {
-               translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height * 2);
-               translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length); // bolt head recess
+               translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height  + 8);
+               //translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_counters8ink, bolt_length); // bolt head recess
             }
 
             translate([pi3_hole_x2, pi3_hole_y2, 0])
             {
-                translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height * 2);
-                translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
+                translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height +8 );
+                //translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
             }
 
             translate([pi3_hole_x1, pi3_hole_y2-_rpi_hole_l_offset, 0])
             {
-               translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height * 2);
-               translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
+               translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height + 8);
+               //translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
             }
 
             translate([pi3_hole_x2, pi3_hole_y2-_rpi_hole_l_offset, 0])
             {
-                translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height * 2);
-                translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
+                translate([0, 0, -1]) cylinder(d=bolt_crest_diameter, h=_height + 8);
+                //translate([0, 0, box_outside_heigth-3]) cylinder(d=bolt_countersink, bolt_length);
             }
         }
 
