@@ -1,4 +1,4 @@
-$fn=60;
+$fn=120;
 
 /*
   http://mathcentral.uregina.ca/QQ/database/QQ.09.09/h/darryl1.html
@@ -55,19 +55,9 @@ _UP=5;
 
 module holder()
 {
-    color("BLUE")
-    {
-        union() {
-            //translate ([0, -7/2, 7])
-            //cube([R*2, 7 *2,  _UP]);
+    translate ([0, -7/2, 5+ 3.88])
+    cube([R*2, 7 ,  _UP*10]);
 
-            translate ([0, -7/2, 5+ 3.88])
-            cube([R*2, 7 *2,  _UP*10]);
-
-            //translate ([0, -7/2, 5])
-            //cube([R*2, 7 *2,  _UP*2]);
-        }
-    }
 }
 
 difference()
