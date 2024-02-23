@@ -5,7 +5,7 @@ width_in  = 2.125;    //x dimension
 length_in = 3.125;    //y dimension
 
  bBuildBody = 1;
- bBuildLockRim = 0;
+ bBuildLockRim = 1;
 
 straight_run = 2.5;  // make it a few feet ha ha
 
