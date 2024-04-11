@@ -1,9 +1,5 @@
 //outside dimensions of the box
 
-// eavestrough mouth dimensions.
-width_in  = 2.125;    //x dimension
-length_in = 3.125;    //y dimension
-
  bBuildBody = 1;
  bBuildLockRim = 1;
 
@@ -14,8 +10,8 @@ $fn= $preview ? 50 : 75;
 
 MM = 25.43;
 
-width_mm = width_in * MM;
-length_mm = length_in * MM;
+length_od = 80.24;
+width_od = 55.62;
 
 straight_run_mm = straight_run * MM;
 
@@ -50,14 +46,14 @@ module make_2D_template(bRemove = false, heigth = straight_run_mm)
 
     if (bRemove)
     {
-        x = width_mm - wall_thickness;
-        y = length_mm - wall_thickness;
+        x = width_od - wall_thickness;
+        y = length_od - wall_thickness;
         cube([x, y, heigth +.1], center = true);
     }
     else
     {
-        x = width_mm;
-        y = length_mm;
+        x = width_od;
+        y = length_od;
         cube([x, y, heigth], center = true);
     }
 }
@@ -65,7 +61,7 @@ module make_2D_template(bRemove = false, heigth = straight_run_mm)
 //========= main ==========================================================
 INTER_SPACE = 40; 
 
-module make_cylinder(bRemove = false, heigth = straight_run_mm, dia = length_mm)
+module make_cylinder(bRemove = false, heigth = straight_run_mm, dia = length_od)
 {
     if (bRemove)
     {
@@ -95,53 +91,53 @@ if (bBuildBody)
             color("MAGENTA", .2)
             rotate([-90, 0, 0])
             //translate([0, 0,  RIM_THICK/2 ])
-            cylinder( d= length_mm + RIM_HEIGTH, h= RIM_THICK, true); 
+            cylinder( d= length_od + RIM_HEIGTH, h= RIM_THICK, true); 
             
             //right end
             color("MAGENTA", .2)
             rotate([-90, 0, 0])
-            translate([0, 0,  (length_mm ) * 2 + INTER_SPACE - RIM_THICK  ])
-            cylinder( d= length_mm + RIM_HEIGTH, h= RIM_THICK, true); 
+            translate([0, 0,  (length_od ) * 2 + INTER_SPACE - RIM_THICK  ])
+            cylinder( d= length_od + RIM_HEIGTH, h= RIM_THICK, true); 
             
 
             color("CYAN", .2)
-            translate([ 0, length_mm/2, 0])
+            translate([ 11, length_od/2, 0])
             make_2D_template(heigth = 100);
 
             color("RED", .2)
-            translate([ 0, (length_mm/2 + length_mm) + INTER_SPACE, 0])
+            translate([ -11, (length_od/2 + length_od) + INTER_SPACE, 0])
             make_2D_template(heigth = 100);
                
             color("GREEN", .2)
             rotate([-90, 0, 0]) 
-            make_cylinder( heigth = (length_mm ) * 2 + INTER_SPACE, dia = length_mm); 
+            make_cylinder( heigth = (length_od ) * 2 + INTER_SPACE, dia = length_od); 
 
             color("MAGENTA", .2)
             rotate([-90, 0, 0])
-            translate([0, 0,  length_mm + INTER_SPACE/2 - RIM_THICK/2 ])
-            make_cylinder( heigth = RIM_THICK, dia = length_mm + RIM_HEIGTH); 
+            translate([0, 0,  length_od + INTER_SPACE/2 - RIM_THICK/2 ])
+            make_cylinder( heigth = RIM_THICK, dia = length_od + RIM_HEIGTH); 
 
         }
         
         run_iterator()
         {
             color("PURPLE")
-            translate([ 0, length_mm/2, 1])
+            translate([ 11, length_od/2, 1])
             make_2D_template(bRemove = true, heigth = 100);
 
             color("RED")
-            translate([ 0, (length_mm/2 + length_mm) + INTER_SPACE, 1])
+            translate([ -11, (length_od/2 + length_od) + INTER_SPACE, 1])
             make_2D_template(bRemove = true, heigth = 100);
                
             color("BLACK")
             rotate([-90, 0, 0]) 
-            make_cylinder( bRemove = true, heigth = (length_mm ) * 2 + INTER_SPACE, dia = length_mm); 
+            make_cylinder( bRemove = true, heigth = (length_od ) * 2 + INTER_SPACE, dia = length_od); 
 
             // screw holes
             color("BLACK")
             rotate([-90, 0, 0]) 
-            translate([ 0, -length_mm, -1])
-            cylinder(h = (length_mm  ) * 3 , d = 3.2);
+            translate([ 0, -length_od, -1])
+            cylinder(h = (length_od  ) * 3 , d = 3.2);
         }
      }
 }
@@ -160,11 +156,11 @@ if (bBuildLockRim)
         {
             color("PINK", .2)
             rotate([-90, 12, 0])
-            translate([0, 0,  length_mm + INTER_SPACE/2 - RIM_COLLAR_THICK/2 ])
-            make_cylinder( heigth = RIM_COLLAR_THICK, dia = length_mm + RIM_COLLAR_HEIGTH); 
+            translate([0, 0,  length_od + INTER_SPACE/2 - RIM_COLLAR_THICK/2 ])
+            make_cylinder( heigth = RIM_COLLAR_THICK, dia = length_od + RIM_COLLAR_HEIGTH); 
 
             {   // make ears for bolt hold downs
-                translate([length_mm - RIM_COLLAR_HEIGTH + 6, length_mm + INTER_SPACE/2, -EAR_HEIGHT/2 + 11  ])
+                translate([length_od - RIM_COLLAR_HEIGTH + 6, length_od + INTER_SPACE/2, -EAR_HEIGHT/2 + 11  ])
                 {
 
                     color("RED", .4)
@@ -174,7 +170,7 @@ if (bBuildLockRim)
                     echo ("rotate = ", $t * 360);
                 }
 
-                translate([-(length_mm - RIM_COLLAR_HEIGTH + 6) , length_mm + INTER_SPACE/2, -EAR_HEIGHT/2 + 11 ])
+                translate([-(length_od - RIM_COLLAR_HEIGTH + 6) , length_od + INTER_SPACE/2, -EAR_HEIGHT/2 + 11 ])
                 {
 
                     color("RED", .4)
@@ -192,15 +188,15 @@ if (bBuildLockRim)
         
             color("GREEN", .2)
             rotate([-90, 0, 0]) 
-            make_cylinder( heigth = (length_mm ) * 2 + INTER_SPACE, dia = length_mm); 
+            make_cylinder( heigth = (length_od ) * 2 + INTER_SPACE, dia = length_od); 
 
             color("MAGENTA", .2)
             rotate([-90, 0, 0])
-            translate([0, 0,  length_mm + INTER_SPACE/2 - RIM_THICK/2 ])
-            make_cylinder( heigth = RIM_THICK +1, dia = length_mm + RIM_HEIGTH); 
+            translate([0, 0,  length_od + INTER_SPACE/2 - RIM_THICK/2 ])
+            make_cylinder( heigth = RIM_THICK +1, dia = length_od + RIM_HEIGTH); 
 
             {   // drill out ear holes
-                translate([length_mm - RIM_COLLAR_HEIGTH + 6, length_mm + INTER_SPACE/2, -EAR_HEIGHT/2 ])
+                translate([length_od - RIM_COLLAR_HEIGTH + 6, length_od + INTER_SPACE/2, -EAR_HEIGHT/2 ])
                 {
 
                     color("RED", .4)
@@ -210,7 +206,7 @@ if (bBuildLockRim)
                     echo ("rotate = ", $t * 360);
                 }
 
-                translate([-(length_mm - RIM_COLLAR_HEIGTH + 6) , length_mm + INTER_SPACE/2, -EAR_HEIGHT/2 ])
+                translate([-(length_od - RIM_COLLAR_HEIGTH + 6) , length_od + INTER_SPACE/2, -EAR_HEIGHT/2 ])
                 {
 
                     color("RED", .4)

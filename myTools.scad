@@ -1,5 +1,9 @@
 
-module tube (r = 0, d = 0, l = 0, thick = 0, centered = true, taper_pct = 0, circlip = false) // r=radius d=dia l=length 
+module tube (r = 0, d = 0, l = 0, 
+            thick = 0, 
+            bCentered = true, 
+            taper_pct = 0, 
+            circlip = false) // r=radius d=dia l=length 
 {
     assert( r != 0 || d != 0, "specify one of radius or diameter");
     assert( l != 0 , "tube: need length 'l' to be non zero");
@@ -15,9 +19,9 @@ module tube (r = 0, d = 0, l = 0, thick = 0, centered = true, taper_pct = 0, cir
     
     
     if (thick > 0)
-        echo ("tube\tMIN id = ", id, "od = ", od, "wall = ", thick, "center= ", centered);
+        echo ("tube\tMIN id = ", id, "od = ", od, "wall = ", thick, "center= ", bCentered);
     else
-        echo ("tube\tMAX od = ", od, "id = ", id, "wall = ", thick, "center= ", centered);
+        echo ("tube\tMAX od = ", od, "id = ", id, "wall = ", thick, "center= ", bCentered);
 
     echo ("tube\tHeigth = ", l);
         
@@ -29,7 +33,7 @@ module tube (r = 0, d = 0, l = 0, thick = 0, centered = true, taper_pct = 0, cir
     assert(dia || dia < 0, "tube : missing r or d ");
     
     // if taper_pct specified, the base will always be closest to 0,0,0
-    translate([ 0, 0, taper_pct == 0 ? 0: centered ? l/2:l  ])
+    translate([ 0, 0, taper_pct == 0 ? 0: bCentered ? l/2:l  ])
     rotate([0, taper_pct == 0 ? 0 : 180, 0 ])
 
     difference()
@@ -56,8 +60,16 @@ module tube (r = 0, d = 0, l = 0, thick = 0, centered = true, taper_pct = 0, cir
     
     }
 }
+//==============================================================================
         
-module abox (dims, thick = 0, centered = true, bRoundOut = true, bRoundIn = false, bSolid = false)
+module abox (dims, 
+            thick = 0, 
+            bCentered = true, 
+            round_out = 0, 
+            round_in = 0, 
+            bSolid = false,
+            bHollow = false,
+            elevator = 0)   // move bottom up by X
 {
     punch = $preview ? .1 : 0; // stop funny view artifact
     
@@ -71,10 +83,10 @@ module abox (dims, thick = 0, centered = true, bRoundOut = true, bRoundIn = fals
     fat = dims + [ wall2, wall2, wall];
     thin = dims - [ wall2, wall2, wall];
     
-    offset = (thick > 0 && centered == false) ? wall : 0;
+    offset = (thick > 0 && bCentered == false) ? wall : 0;
     
     //echo ("abox : adjusting x,y,z by ", offset, " to move origin from  center to 0,0,0");
-    translate( [ centered ? 0 : dims.x /2 + offset, centered ? 0 : dims.y /2 + offset, centered ? 0 : dims.z /2 + offset/2]) 
+    translate( [ bCentered ? 0 : dims.x /2 + offset, bCentered ? 0 : dims.y /2 + offset, bCentered ? 0 : dims.z /2 + offset/2]) 
     {
         if (thick > 0)
         {   
@@ -88,42 +100,58 @@ module abox (dims, thick = 0, centered = true, bRoundOut = true, bRoundIn = fals
         }
         
         // linear extrude alway works in the positive x/y plane an goes upward.
-        // after calc, re-center about 0,0,0 where a centered cube would be
+        // after calc, re-center about 0,0,0 where a bCentered cube would be
         
         translate([ 0, 0, thick > 0  ? -fat.z/2 : -dims.z/2 ])
         difference()
         {
-            router_outside = bRoundOut ? wall : 0;
-            x = thick > 0  ? fat.x : dims.x;
-            y = thick > 0  ? fat.y : dims.y;
+            echo ("round_out = ", round_out);
+
+            // MAKE SOLID BOX --------------------------------------
+            router_outside = round_out ? round_out : 0;
+            x = thick > 0  ? fat.x - router_outside : dims.x - router_outside;
+            y = thick > 0  ? fat.y - router_outside : dims.y - router_outside;
+
+
+            // MAKE PUCHNED INSIDE
+            // using 'offset' it will add r on all dimensions, then round., 
+            // so now you have fatter perimeter than you started with :(
+            //  but at least the corners are round.
+            
+            // Compensate by shrinking dimension by r, 
+            // and then by calling offset, offset will then add it back
 
             color("YELLOW", .2)
 
-            // using 'offset' it will add r on all dimensions, then round., so it you want
-            //      now you have fatter perimeter than you stared with, but corners are round.
-            //      compensate by shrinking dimension by r, calling offset then will put it back include      for bRoundOut, subtract 'r' knowing expansion will happen.
-
             linear_extrude(thick > 0  ? fat.z : dims.z)
-            if (bRoundOut)
+            if (round_out)
             {
-                offset( r= wall/2, $fn=30)
+                offset( r= round_out, $fn=30)
                 square( [x - router_outside, y - router_outside], true);
             }
             else square( [x - router_outside, y - router_outside], true);
            
+            // time to punch out the inside if requested.
             if (bSolid == false)
             {
+                hollow_offset = bHollow ? fat.z/2 + .2  : dims.z/2 +.2;
                 // punching out inside. its either dims or thin.
-                router_inside = bRoundIn ? wall : 0;
-                xi = thick > 0  ? dims.x : thin.x;
-                yi = thick > 0  ? dims.y : thin.y;
+                router_inside = round_in;
+                echo ("round_in = ", router_inside);
+                xi = thick > 0  ? dims.x  : thin.x;
+                yi = thick > 0  ? dims.y : thin.y ;
 
                 color("GREEN")
-                translate([ 0,0, wall]) // make sure the box has a bottom.
-                linear_extrude(thick > 0  ? fat.z - wall + punch : dims.z - wall + punch)
-                if (bRoundIn) 
+
+                // move 'punch' up if you need a bottom else zero (hollowed out)
+
+                translate([ 0,0, bHollow ? -.1 : wall + elevator]) 
+                linear_extrude(thick > 0  ? fat.z - wall  + hollow_offset : dims.z - wall + hollow_offset)
+                //#linear_extrude(fat.z - wall  + hollow_offset)
+                
+                if (round_in) 
                 {
-                    offset( r= wall/2, $fn=30)
+                    offset( r= round_in, $fn=30)
                     square( [ xi - router_inside, yi - router_inside], true);
                 }
                 else
@@ -135,48 +163,57 @@ module abox (dims, thick = 0, centered = true, bRoundOut = true, bRoundIn = fals
 
 
 // 50x25x10 box walls grow inward (-2). on center origin midpoint
-// rounded outside (default), sharp corner inside(default), centered about 0,0,0
+// rounded outside (default), sharp corner inside(default), bCentered about 0,0,0
 //color("GREEN", .9)
 //abox([50,25, 10], -2, true); 
 
-/*
+
 // 50x25x10 box walls grow inward (-2). on center origin midpoint
 // sharp outside corners, rounded inside corners. Sit on x,y plane
 color("BLUE", .9)
-abox([50,25, 10], -2, bRoundOut=false, bRoundIn=true, centered = false);  // 50x25x10 box inside dim origin has 0,0
+abox([50,20, 10], +2, round_in=2, bCentered = false);  // 50x25x10 box inside dim origin has 0,0
+
 
 // 50x25x10 box walls grow inward (-2). on center origin midpoint
 // sharp corners inside and out. sits on x,y plane
 color("GREY", .9)//
 translate([ 55, 0, 0])      
-abox([50,25, 10], +2, bRoundOut=false, bRoundIn=false, false); // 50x25x10 box outside dim origin is 0,0
-*/
+abox([50,20, 10], +2, round_out=3, false);
 
+color("PINK", .9)//
+translate([ 115, 10, 10])      
+abox([86.66, 56.865, 5], -5, bHollow = true, bCentered = false); 
+
+color("GREEN", .9)//
+translate([ 140, 10, -10])      
+abox([86.66, 56.865, 5], 3, bHollow = true, bCentered = false); 
+
+/*
 // 50x25x10 box walls grow inward (-2). on center origin midpoint
 // round corners outside and SOLID
 color("BLUE", .9)//
 translate([ 55, 0, 0])      
-abox([50,25, 10], +2, bRoundOut=true, bRoundIn=false, false, bSolid = true); // 50x25x10 box outside dim origin is 0,0
-
+abox([50,25, 10], +2, round_out=2, round_in=0, false, bSolid = true); // 50x25x10 box outside dim origin is 0,0
+*/
 
 //translate ([-30,-30, 0])
 {
 /*
     // tube outer dia  20, inner dia = (20 - 8)
     color("PINK")
-    tube (d = 20, l = 20, thick = -8, centered = false);
+    tube (d = 20, l = 20, thick = -8, bCentered = false);
 
     // tube, inner dia = (2* 10), outer dia = ((2*10) + 2) 
     color("PURPLE", .3)
-    tube (r = 10, l = 20, thick = +2, centered= true);
+    tube (r = 10, l = 20, thick = +2, bCentered= true);
 */
-
-    tube (d = 60, l = 20, thick = -6, centered = false);
+/*
+    tube (d = 60, l = 20, thick = -6, bCentered = false);
 
     translate([0, 0, 50])
-    tube (d = 60, l = 20, thick = -6, centered = false, taper_pct = 20, circlip = true);
+    tube (d = 60, l = 20, thick = -6, bCentered = false, taper_pct = 20, circlip = true);
     //color("GREEN")
-    //tube (d = 20, l = 20, thick = -2, centered = false, taper = 10, circlip = true);
-
+    //tube (d = 20, l = 20, thick = -2, bCentered = false, taper = 10, circlip = true);
+*/
 
 }

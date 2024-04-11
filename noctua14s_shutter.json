@@ -1,0 +1,17 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "New set 1": {
+            "adapter_heigth": "20",
+            "make_box": "true",
+            "make_gate": "true",
+            "window_outside": "136"
+        },
+        "New set 2": {
+            "adapter_heigth": "20",
+            "make_box": "true",
+            "make_gate": "false",
+            "window_outside": "150"
+        }
+    }
+}

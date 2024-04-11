@@ -1,7 +1,7 @@
 //use <otherPeoplesWork/threads-scad/threads.scad>
 use <myTools.scad>
 
-
+M5_is_leftsided  = true;
 laptop_frame_horiz = 13;
 laptop_frame_depth = 5.67;
 laptop_frame_vert = 45.1;
@@ -41,5 +41,10 @@ module build_M5()
     }    
  }
 
-
-build_M5();
+if (M5_is_leftsided)
+{
+    mirror([ 0, 0, 1])
+    build_M5();
+}    
+else
+    build_M5();

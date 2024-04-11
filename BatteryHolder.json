@@ -1,0 +1,33 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "New set 1": {
+            "BATTERY_TILT": "30",
+            "NUM_ACROSS": "5"
+        },
+        "New set 2": {
+            "BATTERY_TILT": "30",
+            "NUM_ACROSS": "4",
+            "NUM_DOWN": "1"
+        },
+        "New set 3": {
+            "BATTERY_TILT": "30",
+            "NUM_ACROSS": "2",
+            "NUM_DOWN": "1"
+        },
+        "New set 4": {
+            "BATTERY_TILT": "30",
+            "BATTERY_TYPE": "Sub-C",
+            "NUM_ACROSS": "2",
+            "NUM_DOWN": "1",
+            "XRAY_ENABLED": "true"
+        },
+        "New set 5": {
+            "BATTERY_TILT": "30",
+            "BATTERY_TYPE": "9V",
+            "NUM_ACROSS": "3",
+            "NUM_DOWN": "2",
+            "XRAY_ENABLED": "false"
+        }
+    }
+}
