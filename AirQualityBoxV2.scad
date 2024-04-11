@@ -21,33 +21,33 @@ BN_DIA = 3;
 DIST = DIA + BN_DIA;
 LENGTH= x * 1.2;
 
-across = 3;  // must be odd
+across = 4;  // must be odd
 down = 7;     // must be odd
 
-module oneRowX(ACROSS, DOWN)
+module oneRowX(ACROSS, offset)
 {
     centerDot_x = (ACROSS -1) /2;
     //echo("centerDot_x is ", centerDot_x + 1);
     translate([ -(centerDot_x) * DIST, 0, 0 ])
     for ( ac = [ 0: 1: ACROSS -1 ])
         //echo ("ac = ", ac)
-        translate([ ac * (DIST), 0, -LENGTH/2 ])
-            cylinder( d= DIA, h= LENGTH, center= false);
+        translate([ ac * (DIST), 0 , -LENGTH/2 + offset ])
+            #cylinder( d= DIA, h= LENGTH, center= false);
 }
 
 
-module makeArray(ACROSS, DOWN, ROTATE)
+module makeArray(ACROSS, DOWN, ROTATE, offset = 0)
 for (dn = [ 0: 1: (DOWN -1)/2])
 {
     rotate(ROTATE)
     translate ([(dn % 2)? 0: DIST/2, dn * (DIST), 0]) // make postive row
-        oneRowX(ACROSS);
+        oneRowX(ACROSS, offset);
 
     if ( dn != 0 )
     {
         rotate(ROTATE)
         translate ([ (dn % 2)? 0: DIST/2, -dn * DIST, 0])  // mirror negative row
-            oneRowX(ACROSS);
+            oneRowX(ACROSS, offset);
     }
 }
 
@@ -57,12 +57,12 @@ difference()
     {
         abox( AQ_outside, thick = +WALL_THICK, round_out =2, bCentered = true);
 
-        //makeArray(across, down, [0, 90, 0]);
+        makeArray(across, down, [0, 90, 0], -20);  // -20 punch only left face
         makeArray(9 , 5, [90, 0, 0]);
     }
   
     // USB PUNCH OUT
-    translate ([x/2 - .1 , -y/2 + 23, z/2 - 6]) // x/2 = inside of wall.
+    translate ([x/2 - .1 , -y/2 + 23 -2, z/2 - 6]) // x/2 = inside of wall.
     rotate([ -90, -180, -90])
     #make_USBA();
     
