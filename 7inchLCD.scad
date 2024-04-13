@@ -1,12 +1,12 @@
 use <myTools.scad>
+use <usbA-C.scad>
 
 MM=25.43;
 
-bMakeGuide = true;
 
-bMakeFrame = true;
-bMakeBottom = false;
-
+bMakeFrame = false; //true;
+bMakeBottom = false; //true;
+bMakeBackSide = true; //true;
 
 inside_length = 6 * MM + 17.49 + 1.25;
 inside_width = 111.23 + .5 ;
@@ -69,18 +69,36 @@ if (bMakeFrame)
     }
 }
 
-if (bMakeGuide)
+
+box_height = 40;
+
+if (bMakeBackSide)
 {
 
-    translate([ 0,0, 70])
-    union()
+    translate([ 0,0, 120])
     {
-        color("GREY")
-        abox([inside_length + BEZEL_THICK *2 + .8, 
-              inside_width + BEZEL_THICK *2 + .8, 
-              outside_height * 2], 
-              thick = +BEZEL_THICK, 
-              bHollow = true, bCentered = true);
+        difference()
+        {
+            color("GREEN", .5)
+            rotate([-180, 0, 0])
+            {
+                abox([inside_length + BEZEL_THICK *2 + .7, 
+                      inside_width + BEZEL_THICK *2 + .7, 
+                      box_height], 
+                      thick = +BEZEL_THICK, 
+                      bHollow = false, bCentered = true, round_out=3);
+            }
+            
+            translate([0,0, -box_height/2 +2])
+            #cylinder(h = box_height, d= 25.4 * 5 /8);
+            
+            // position usb from the center line, not from a wall.
+            translate([ (inside_length + BEZEL_THICK *3)/2 -2, 
+                        (inside_width + BEZEL_THICK *3)/2 - 51, 
+                         box_height/2 - 33.8/4])
+            rotate([ 90, 0, 90])
+            #make_USBA();
+        }
     }
 }
 
