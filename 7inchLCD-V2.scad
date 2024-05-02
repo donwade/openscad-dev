@@ -135,6 +135,7 @@ if (bMakeFoot)
     }
 }
 
+alt_width = 65;
 if (bMakeAlt)
 {
     translate([ 0,0, 250])
@@ -145,45 +146,39 @@ if (bMakeAlt)
             rotate([-180, 0, 0])
             {
                 abox([inside_length + BEZEL_THICK  + .7 + 6,  // foot is bigger 
-                      inside_width + BEZEL_THICK  + .7 + 6,   // foot is bigger
+                      alt_width + BEZEL_THICK  + .7 + 6,   // foot is bigger
                       box_height ],                         // foot is thinner
                       thick = +BEZEL_THICK, 
                       bSolid = true, bCentered = true, round_out=3); // make solid
             }
             
             
-            // hollow out bottom.
+            // hollow out bottom. pass 1
             UP = 5;
             translate([0, 0, -UP -.1])
             rotate([-180, 0, 0])
             {
                 abox([inside_length  + .7,  
-                      inside_width +  .7,  
+                      alt_width +  .7,  
                       box_height * 3/4],   
                       thick = +BEZEL_THICK, 
                       bSolid = true, bCentered = true, round_out=3); // make solid
             }
-
+            off = 25;
+            // small cutout for mylar connector
             cutout = [ 20, 10, box_height + BEZEL_THICK];
-            translate([ -cutout.x/2 , -cutout.y/2 -30 , cutout.z/2])
+            translate([ -cutout.x/2 , off -cutout.y/2 -30 , cutout.z/2])
             rotate([-180, 0, 0])
             #cube ( cutout);
-            
-            // position usb from the center line, not from a wall.
-            translate([ -(inside_length/2 + BEZEL_THICK *3) +40 , (inside_width/2 + BEZEL_THICK *3) - 10,
-                      box_height/2 - UP + BEZEL_THICK - 25.69 ] )
-            {
-                //#cube([ inside_length, inside_width, .1]);
-                rotate([ -90, 0, 0])
-                #make_USBA("BELOW");
-            }
+
+ 
             // punch out the LcD display at an angle.
-            translate([ 0, -33, 70]) // just make it catch front lip
+            translate([ 0, -33 + off, 70]) // just make it catch front lip
             rotate([70, 0, 0])
             {
                 #abox([inside_length + .8, 
                       inside_width + .8, 
-                      17 - BEZEL_THICK + .7], 
+                      18 - BEZEL_THICK + .7], 
                       thick = +BEZEL_THICK,  
                       bSolid = true, bCentered = true);
             }
