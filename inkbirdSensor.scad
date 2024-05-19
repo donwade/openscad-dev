@@ -1,7 +1,7 @@
 $fn=60;
 
 total_heigth= 30;
-inside_core_dia= 5.1;
+inside_core_dia= 5.2;
 hypotheneus = sqrt((total_heigth  * total_heigth) * 2);
 
 thick = 2;  // 3 is not flexible
