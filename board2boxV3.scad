@@ -14,7 +14,13 @@ wall_thickness = 2;     // total thickness of any wall
     bolt_drill_diameter = 2.5 ; //for M3 appropriate drill for bolt dia
 
     underside_tallest_component = 6;
-    go_usb = true;
+    
+    mini_trans=[ board.x/2 - 9.55 , board.y/2 - wall_thickness*2 , -board.z];
+    mini_rotor=[ -90, 180, 0];
+
+    c_trans = [ board.x/2 - 23.86, -board.y/2 + wall_thickness*2 , -board.z];
+    c_rotor = [ 90, 0, 0]);
+
 */
 
 /*
@@ -32,7 +38,7 @@ wall_thickness = 2;     // total thickness of any wall
 
 
     BOARD="DRIVER";  // waveshare driver board
-    driver_board = [48.76, 29.44, 2.48];
+    driver_board = [48.76, 29.44, 1.61 * 2];
     driver_bolt_inside = [ 0, 0 ];
     driver_bolt_outside= [ 0, 0 ];
     board = driver_board;
@@ -42,6 +48,11 @@ wall_thickness = 2;     // total thickness of any wall
     bolt_drill_diameter = 0; //M2 appropriate drill for bolt dia
     go_usb = false;
 
+    mini_trans=[ board.x/2, 0, -board.z];
+    mini_rotor=[ -90, 0, -90];
+
+    c_trans = [ 0,0,0];
+    c_rotor = [ 90, 0, 0];
 
 /*
     BOARD="WROVER_DEV";
@@ -91,6 +102,30 @@ lid_lip = 2;            // 0 makes lid flush to top
 lid_tolerance = .5;     // shrink lid so not squeaky fit
 
 fn=50;
+
+//-------------------------------------------------------------------------
+
+module miniUSB(trans, rotor)
+{
+    if (trans != [ 0,0,0])
+    {
+        translate(trans)
+        rotate(rotor)
+        make_USBA(location = "BELOW");
+    }
+}
+
+//-------------------------------------------------------------------------
+
+module USB_C(trans, rotor){    
+    if (trans != [ 0,0,0])
+    {
+        translate(trans)
+        rotate(rotor)
+        make_USBC(location = "BELOW");
+    }
+}
+
 //-------------------------------------------------------------------------
 // make 4 cylinders EXACTLY on all 4 xy permutations
 module quad_cylinders(x,y,z,h,r)
@@ -203,17 +238,13 @@ difference()
                     h= board.z + .2,
                     r = 1); //dont bother figuring out board radius.
             }
-            
-            if (go_usb)
-            {
-                translate([ board.x/2 - 9.55 , board.y/2 - wall_thickness*2 , -board.z])
-                rotate([ -90, 180, 0])
-                make_USBA(location = "BELOW");
-                
-                translate([ board.x/2 - 23.86, -board.y/2 + wall_thickness*2 , -board.z])
-                rotate([ 90, 0, 0])
-                make_USBC(location = "BELOW");
-            }
+
+        
+            miniUSB( trans= mini_trans,
+                     rotor= mini_rotor);
+
+            USB_C( trans= c_trans,
+                   rotor= c_rotor);
         }
         add_screws();
     }  // box is complete
@@ -224,6 +255,14 @@ difference()
     translate([0, -box_outside_y/2 + wall_thickness, -box_outside_z+wall_thickness*2])
     rotate([180, 0, 0])
     #cube ([5,wall_thickness+12, 3], true);
+
+    // WAVESHARE RIBBON ------------------------
+    RIBBON = [ 16, 10, 2];
+    translate([box_outside_x/2 - RIBBON.x/2 - 5.3 , -box_outside_y/2 +wall_thickness, -box_outside_z/2+wall_thickness*2])
+    rotate([0, 0, 90])
+    #cube ([5,wall_thickness+12, 3], true);
+    // -----------------------------------------
+
     
     // make a cross section.
     translate([cross_section? 0:99999, 
@@ -233,7 +272,13 @@ difference()
 }
 
 
-/*
+/*    miniUSB( trans=[ board.x/2 - 9.55 , board.y/2 - wall_thickness*2 , -board.z],
+             rotor [ -90, 180, 0]);
+    
+    USB-C( trans=[ board.x/2 - 23.86, -board.y/2 + wall_thickness*2 , -board.z],
+            rotor= [ 90, 0, 0])
+             
+
 
 // create a lid
 
