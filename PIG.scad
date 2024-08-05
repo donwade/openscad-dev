@@ -29,6 +29,21 @@ module make_nub()
         sphere(d = NUB_DIA);
     }
 }
+//---------------------------------------------------------------------
+module make_cross_section()
+{
+    // open up one quadrant 
+    translate([ -OUTSIDE_DIA, 0,  -OUTSIDE_DIA/2])
+    union()
+    {
+        cube([OUTSIDE_DIA, OUTSIDE_DIA, OUTSIDE_DIA]);
+    }
+    
+    // small view hole on top
+    translate([ 0, 0,  -OUTSIDE_DIA/2])
+    cylinder(d=3, h = OUTSIDE_DIA);
+}
+//---------------------------------------------------------------------
 
 module make_female()
 {
@@ -41,25 +56,11 @@ module make_female()
             sphere( d = DIA + .1);
         }
 
+       //make_cross_section();
 
-        // open up one quadrant 
-        translate([ -OUTSIDE_DIA, 0,  -OUTSIDE_DIA/2])
-        union()
-        {
-            cube([OUTSIDE_DIA, OUTSIDE_DIA, OUTSIDE_DIA]);
-        }
-        
         // shave off anything below the x,y plane
         translate([ -OUTSIDE_DIA/2, -OUTSIDE_DIA/2,  -OUTSIDE_DIA])
-        union()
-        {
-            cube([OUTSIDE_DIA, OUTSIDE_DIA, OUTSIDE_DIA]);
-        }
-
-        // small view hole on top
-        translate([ 0, 0,  -OUTSIDE_DIA/2])
-        cylinder(d=3, h = OUTSIDE_DIA);
-
+        cube([OUTSIDE_DIA, OUTSIDE_DIA, OUTSIDE_DIA]);
     }
 }
 //---------------------------------------------------------------------
