@@ -10,7 +10,7 @@ laptop_frame_vert = 45.1;
 
 punch = $preview ? 2: 0;
 
-x = 54.1;   // M5 
+x = 54;   // M5 
 y = x;      // M5
 z = 8;      // covers some connectors.
 
@@ -29,15 +29,15 @@ pacman_mouth = [ laptop_frame_horiz, laptop_frame_vert, laptop_frame_depth];
 module build_M5()
 {
     // container for the M5
-    abox( M5_outside, thick = +2, bRoundOut=true, bRoundIn=true, centered = false);
+    abox( M5_outside, thick = +2, round_out=2, round_in=2, bCentered = false);
 
     // make the pacman
     translate([-laptop_frame_horiz, 0, -pacman.z])
     difference()
     {
-        abox( pacman, thick = +2, bRoundOut=true, bSolid=true, centered = false);
+        abox( pacman, thick = +2, round_out=1, bSolid=true, bCentered = false);
         translate([pacman_mouth.x/2 + wall , pacman_mouth.y/2 + wall, pacman.z/2])
-        #abox( pacman_mouth, thick = +2, bSolid = true, bRoundOut = false, centered = true);
+        #abox( pacman_mouth, thick = +2, bSolid = true, round_out=1, bCentered = true);
     }    
  }
 
