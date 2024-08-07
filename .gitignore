@@ -1,0 +1,9 @@
+errors.log
+build.keep
+parse4si*
+*.json
+*.stl
+*.3mf
+*.gcode
+*.txt
+
