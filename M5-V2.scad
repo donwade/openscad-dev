@@ -3,14 +3,14 @@ use <myTools.scad>
 
 M5_is_leftsided  = true;
 laptop_frame_horiz = 13;
-laptop_frame_depth = 5.67;
+laptop_frame_depth = 5.8; // adds 2 later 
 laptop_frame_vert = 45.1;
 
 /* [Hidden] */
 
 punch = $preview ? 2: 0;
 
-x = 54;   // M5 
+x = 54.1;   // M5 
 y = x;      // M5
 z = 8;      // covers some connectors.
 
