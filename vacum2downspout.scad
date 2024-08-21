@@ -55,3 +55,26 @@ difference()
     
     }
 }
+
+DRILL = 09;
+DIST= DRILL * 1.2;
+$fn = 30;
+W= 2;
+H= 3;
+
+translate([0, 0, 150])
+difference()
+{
+    cube (insidePipe - [ 4, 4, 40] , center = true);
+
+    for (across = [ -W:  1 : W])
+    {
+        for (row = [ -H: 1 : H])
+        {
+            echo ("row = ", row, " across = ", across);
+            translate ([ row * DIST, across * DIST, -15])
+            #cylinder(d = DRILL, h = 30);
+        }
+    }
+}
+

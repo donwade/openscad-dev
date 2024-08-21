@@ -1,9 +1,11 @@
 FUDGE=.25;
 wall_thickness = 2;     // total thickness of any wall
 
-board_x  = 38.71;   //x dimension                                                     
-board_y = 38.86;    //y dimension
+board_x  = 38.71 + .5;   //x dimension                                                     
+board_y = 38.86 + .5;    //y dimension
 board_z = 1.58;     // board thickness
+
+ledge_depth  = 1.5;
 
 bolt_inside_x = 26.7;
 bolt_outside_x = 34.43;
@@ -151,8 +153,8 @@ difference()
                 prep_roundbox(
                     x=(board_x/2 +.1 ),
                     y=(board_y/2 + .1),
-                    z= -board_z, 
-                    h= board_z + .2,
+                    z= -board_z - ledge_depth, 
+                    h= board_z + ledge_depth + .01,
                     r = 1); //dont bother figuring out board radius.
             }
             
@@ -161,7 +163,8 @@ difference()
             cylinder(h= wall_thickness, d = 12);
         }
         add_screws( z= -(box_outside_z- wall_thickness + board_z),
-            h= box_outside_z- wall_thickness);
+                    h= box_outside_z- wall_thickness-2 // the board does NOT sit on posts!
+                    );
         
     }  // box is complete
     
@@ -173,10 +176,11 @@ difference()
 //=======================================================
 module create_lid()
 {
+    off = 13.9 + mic_dia/2;
+    
     difference()
     {
-        union()
-        {
+        //union()
                // make 2 boxes one on TOP the other and remove "inside box" from "outside box"
                 // use prep_roundbox to define OUTSIDE of a solid box centered on 0,0
                 hull(){
@@ -191,15 +195,14 @@ module create_lid()
                 // the board will sit on a ledge. Cut out a board on the
                 // TOP face of the box that the board will sit IN.
                 
-                hull(){
+                #hull(){
                     prep_roundbox(
                         x=(board_x/2 +.1 ),
                         y=(board_y/2 + .1),
-                        z= 0, //-board_z + 3, 
-                        h= board_z -1,
+                        z= -1, //-board_z + 3, 
+                        h= board_z *2,
                         r = 1); //dont bother figuring out board radius.
                 }
-        }
             
         // drill the holes for the screws (no posts)
         #quad_cylinders( 
@@ -211,7 +214,7 @@ module create_lid()
         );
 
         //translate([-mic_dia + board_x, 0, -lid_thickness])
-        translate([board_x/2 - mic_dia/2, 0, -lid_thickness])
+        translate([board_x/2 - mic_dia/2, board_y/2 -off, -lid_thickness])
             #cylinder(h=lid_thickness * 2, r = mic_dia/2 );
         
     }  // box is complete
