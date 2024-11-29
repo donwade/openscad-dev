@@ -17,7 +17,10 @@ module build_TOILET()
     difference()
     {
         // container for the TOILET
-        abox( TOILET_outside, thick = -2, bRoundOut=4, bSolid = true, centered = false);
+        abox( TOILET_outside, thick = -2, 
+                round_out=4, 
+                bSolid = true, 
+                bCentered = false);
 
         DIA=9.5;
         

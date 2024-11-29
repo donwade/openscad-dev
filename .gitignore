@@ -6,4 +6,6 @@ parse4si*
 *.3mf
 *.gcode
 *.txt
+*.obj
+*.svg
 

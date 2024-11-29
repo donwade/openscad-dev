@@ -126,7 +126,7 @@ module abox (dims,
             // Compensate by shrinking dimension by r, 
             // and then by calling offset, offset will then add it back
 
-            color("YELLOW", .2)
+            //color("YELLOW", .2)
 
             // ready height 
             linear_extrude(thick > 0  ? fat.z : dims.z)

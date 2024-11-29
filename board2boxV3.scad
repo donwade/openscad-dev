@@ -36,7 +36,7 @@ wall_thickness = 2;     // total thickness of any wall
     go_usb = false;
 */
 
-
+/*
     BOARD="DRIVER";  // waveshare driver board
     driver_board = [48.76, 29.44, 1.61 * 2];
     driver_bolt_inside = [ 0, 0 ];
@@ -53,9 +53,11 @@ wall_thickness = 2;     // total thickness of any wall
 
     c_trans = [ 0,0,0];
     c_rotor = [ 90, 0, 0];
+    WAVESHARE_RIBBON = [ 16, 10, 2];
 
-/*
-    BOARD="WROVER_DEV";
+*/
+
+    BOARD="BREAKOUT_BOARD";
     charger_board = [87.10, 75.26, 1.67];
     charger_bolt_inside = [ 78.23, 66.10 ];
     charger_bolt_outside= [ 83.73, 71.74 ];
@@ -65,7 +67,13 @@ wall_thickness = 2;     // total thickness of any wall
     bolt_drill_diameter = 2.5 ; //for M3 appropriate drill for bolt dia
     underside_tallest_component = 3;
     go_usb = false;
-*/
+    mini_trans=[ 0,0,0];
+    mini_rotor=[ -90, 0, -90];
+
+    c_trans = [ 0,0,0];
+    c_rotor = [ 90, 0, 0];
+    WAVESHARE_RIBBON = [ 0,0,0];
+
 cross_section = false;
 
 //-------------------------------------------------------------
@@ -256,11 +264,13 @@ difference()
     rotate([180, 0, 0])
     #cube ([5,wall_thickness+12, 3], true);
 
-    // WAVESHARE RIBBON ------------------------
-    RIBBON = [ 16, 10, 2];
-    translate([box_outside_x/2 - RIBBON.x/2 - 5.3 , -box_outside_y/2 +wall_thickness, -box_outside_z/2+wall_thickness*2])
-    rotate([0, 0, 90])
-    #cube ([5,wall_thickness+12, 3], true);
+    // WAVESHARE_RIBBON ------------------------
+    if (WAVESHARE_RIBBON.x != 0)
+    {
+        translate([box_outside_x/2 - WAVESHARE_RIBBON.x/2 - 5.3 , -box_outside_y/2 +wall_thickness, -box_outside_z/2+wall_thickness*2])
+        rotate([0, 0, 90])
+        #cube ([5,wall_thickness+12, 3], true);
+    }
     // -----------------------------------------
 
     
