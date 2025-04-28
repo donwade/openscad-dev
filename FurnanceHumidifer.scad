@@ -29,7 +29,7 @@ module scew_quad ()
         }
     }
 }
-bMakeBase=1;
+bMakeBase=0;
 
 if ( bMakeBase)
 {
@@ -63,8 +63,9 @@ else
     //translate([ -THICK, 0, -THICK/4])
     difference()
     {
-        cube ([ 235 , OUTER_DIA - THICK - 1.5, THICK-1], center=true );
-        translate([-250/2 + 25/2 + 10, 0, 0])
+        //cube ([ 235 , OUTER_DIA - THICK - 1.5, THICK-1], center=true );
+        cube ([ 235 - 30 , OUTER_DIA - THICK - 2.5, THICK-2], center=true );
+        translate([-250/2 + 25/2 + 10 + 15, 0, 0])
         #cylinder(h=20, d=20, center=true);
     }
 }
