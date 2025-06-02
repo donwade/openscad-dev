@@ -5,7 +5,8 @@ THICK=3;
 DIA=20;
 HEIGHT= 30;
 
-DEMO=1;
+// = 0 ready for printer
+DEMO=0;
 
 UP= DEMO ? 0 : 5;
 
@@ -42,7 +43,7 @@ module bottom()
         // }
         
         translate([ 0, 0, UP ])
-        cylinder (d=DIA-THICK*2 - 1.5, h= HEIGHT -UP );
+        cylinder (d=DIA-THICK*2 - .5, h= HEIGHT -UP );
 
         translate([ -DIA/8 + .5, -DIA, UP  ])
         cube([DIA/4-1, DIA, HEIGHT -UP ]);
