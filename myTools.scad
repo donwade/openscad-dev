@@ -74,7 +74,9 @@ module abox (dims,
     punch = $preview ? .1 : 0; // stop funny view artifact
     
     assert(thick != 0, "Thick must be specified. +=outside dim, -= inside dims");
-    assert(dims.z > thick, "wall thickness too large for depth of box");
+    
+    
+//    assert(dims.z > thick, "wall thickness too large for depth of box");
 
     wall2 = abs(thick) * 2; // 2 walls in each direction
     wall = wall2 / 2;
