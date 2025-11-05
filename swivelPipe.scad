@@ -4,20 +4,16 @@ $fn = $preview ? 50 : 120;
 //DEBUG= $preview ? 0 : 1;
 DEBUG= 1;
 //=================================================
-TWEAK = 1;
-// white
-W1 = 80.86 + TWEAK;
-L1 = 60.49 + TWEAK;
-Q1 = sqrt (W1*W1 + L1*L1);
-echo ("Q1 = ", Q1);
+//W = 2 * 25.4;
+//L = 3 * 25.4;
+W1 = 2 * 25.4;//
+L1 = 3 * 25.4;
 
-W2 = 80.92 + TWEAK;
-L2 = 57.62 + TWEAK;
-Q2 = sqrt (W2*W2 + L2*L2);
-echo ("Q2 = ", Q2);
+W2 = 2 * 25.4;//
+L2 = 3 * 25.4;
 
 THICK=4;
-LEN = 10;
+LEN = 6 * 25.4;
 
 A = W1 * L1; //square inches of down pipe
 
@@ -34,13 +30,11 @@ echo ("pipe DIA = ", DIA,"mm");
 cylinder1 = [ THICK,   DIA,      L1 * 3,     [0,0,0], [0,0,0],  DEBUG, DEBUG ]; // dia, len, translate[x,y,z]
 cylinder2 = [ THICK*2, RING_DIA, RING_LEN,   [0,0,0], [0,0,0],  DEBUG, DEBUG ]; // dia, len, translate[x,y,z]
 
-OK = LEN - W1 - THICK;
-
 //         T        DIM              TRANS                                                     ROTATE      L  R                  
-box1 = [THICK, [ W1, L1, LEN] , [  0,0,0 ], [ 90, 0, 90 ], 0, 0];
-box2 = [THICK, [ W2, L2, LEN] , [  0, L2 * 4/2, 0], [ 90, 0, 90 ], 0, 0];
+box1 = [THICK, [ W1, L1, LEN] , [  -DIA/4 + THICK*1.5,   L1-THICK/2  -THICK/2 ,    LEN/2 ], [ 90, 0, 90 ], 0, 0];
+box2 = [THICK, [ W2, L2, LEN] , [   DIA/4 - THICK*1.5, -(L2-THICK/2) +THICK/2,  LEN/2 ], [ 90, 0, 90 ], 0, 0];
 
-C_LIST = []; //, cylinder3, cylinder4, cylinder5, cylinder6, cylinder7, cylinder8 ]; 
+C_LIST = [cylinder1]; //, cylinder3, cylinder4, cylinder5, cylinder6, cylinder7, cylinder8 ]; 
 BOX_LIST=[box1, box2]; //[box1, box2];
 
 //------------------------------------------------------------
