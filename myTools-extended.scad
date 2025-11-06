@@ -303,6 +303,7 @@ module testx()
           make_cylinders("BOM", PARTS_LIST=CYLINDER_LIST)
             make_cylinders("REMOVE", PARTS_LIST=CYLINDER_LIST);
           
+          // cutaway view
           translate([0,0,-50]) cube([100,100,100]);
         }
     } 

@@ -6,46 +6,97 @@ DEBUG= 1;
 //=================================================
 
 TWEAK = 1;
-W1 = 80.86 + TWEAK;
-L1 = 57.62 + TWEAK;
+WHITE_W = 80.86 + TWEAK;
+WHITE_L = 57.62 + TWEAK;
 
-W2 = 80.92 + TWEAK;
-L2 = 57.62 + TWEAK;
+BLACK_W = 80.92 + TWEAK;
+BLACK_L = 57.62 + TWEAK;
 
 THICK=4;
-LEN = 6 * 25.4;
+PIPE_LEN = 9 * 25.4;
+BOX_LEN = 6 * 25.4;
 
-A = W1 * L1; //square inches of down pipe
+A = WHITE_W * WHITE_L; //square inches of down pipe
 
 TRUE_DIA = (2 * sqrt( A /PI));
-DIA = round( TRUE_DIA + 10);  // round up to nearest 10mm
+PIPE_iDIA = round( TRUE_DIA + 10);  // round up to nearest 10mm
 
-RING_DIA = DIA + 10;
+RING_DIA = PIPE_iDIA + 10;
 RING_LEN = 10;
 
 echo ("pipe AREA = ", A, "sq mm");
-echo ("pipe DIA = ", DIA,"mm");
+echo ("pipe PIPE_iDIA = ", PIPE_iDIA,"mm");
 
 SCREW_DIA= 3/16 * 25.4;
 
+function AVG(a,b) = (a+b)/2;
 
 //              T         D           H           TRANS     ROTATE   endcap endcap               
-cylinder1 = [ THICK,     DIA,         L1 * 4,     [0,0,0], [0,0,0],  DEBUG, DEBUG ]; // dia, len, translate[x,y,z]
-screw1 =    [ SCREW_DIA, SCREW_DIA*2, W1-THICK * 16/4, [115, -(W2/4 - THICK*3/2), (LEN)/2], [90,0,0], 0, 0 ]; // dia, len, translate[x,y,z]
-screw2 =    [ SCREW_DIA, SCREW_DIA*2, W2-THICK * 16/4, [115,  (W2/4 - THICK*3/2), -(LEN)/2], [90,0,0], 0, 0 ]; // dia, len, translate[x,y,z]
+cylinder1 = [ THICK,     PIPE_iDIA,  PIPE_LEN,     [0,0,0], [0,0,0],  DEBUG, DEBUG ]; // dia, len, translate[x,y,z]
+
+screw1 =    [ SCREW_DIA, SCREW_DIA*2, WHITE_W-THICK * 16/4, [115, -(BLACK_W/4 - THICK*3/2), (PIPE_LEN)/2], [90,0,0], 0, 0 ]; // dia, len, translate[x,y,z]
+screw2 =    [ SCREW_DIA, SCREW_DIA*2, BLACK_W-THICK * 16/4, [115,  (BLACK_W/4 - THICK*3/2), -(PIPE_LEN)/2], [90,0,0], 0, 0 ]; // dia, len, translate[x,y,z]
 
 
 //         T        DIM              TRANS                                                     ROTATE      L  R                  
-box1 = [THICK, [ W1, L1, LEN] , [ (LEN/2 - THICK), (DIA/4 - THICK*2),   -(DIA-THICK*4)], [ 0, 90, 0 ], 0, 0];
-box2 = [THICK, [ W2, L2, LEN] , [ (LEN/2 - THICK),-(DIA/4 - THICK*2),  (DIA-THICK*4)], [ 0, 90, 0 ], 0, 0];
+white = [THICK, [ WHITE_W, WHITE_L, BOX_LEN] ,
+        [   (BOX_LEN/2 - THICK), 
+            (PIPE_iDIA/4 - THICK*2), 
+            (-PIPE_LEN/2 + WHITE_L - THICK*3 - THICK * 27/64)
+        ], 
+        [ 0, 90, 0 ], 0, 0];
+        
+black = [THICK, [ BLACK_W, BLACK_L, BOX_LEN] , 
+        [   (BOX_LEN/2 - THICK),
+            -(PIPE_iDIA/4 - THICK*2),
+            -(-PIPE_LEN/2 +BLACK_L/2 + THICK*3 +THICK * 59/64)],
+        [ 0, 90, 0 ], 0, 0];
+
+// make supports so prusa supports are not needed.
+support1 = [-2, [ WHITE_W-.5, WHITE_L-.5, PIPE_LEN] , [ -BLACK_W/2, 0, PIPE_LEN/2],    [ 0, 0, 0 ], 0, 0];
+support2 = [-2, [ BLACK_W-.5, BLACK_L-.5, PIPE_LEN] , [  BLACK_W/2+3, 0, PIPE_LEN/2], [ 0, 0, 0 ], 0, 0];
+
 
 C_LIST = [cylinder1]; //, screw1, screw2]; //, cylinder3, cylinder4, cylinder5, cylinder6, cylinder7, cylinder8 ]; 
-BOX_LIST=[box1, box2]; //[box1, box2];
+BOX_LIST=[white, black]; //[white, black];
 
+SUPPORT_LIST=[support1]; // both are almost the same.
 //------------------------------------------------------------
-
-difference()
+module make_drains()
 {
+    difference()
+    {
+        {
+            difference()
+            {
+                union()
+                {
+                  #make_cylinders(action="BOM", PARTS_LIST=C_LIST)
+                    make_cylinders(action="ADD", PARTS_LIST=C_LIST);
+                    //
+                  make_cubes("BOM", PARTS_LIST=BOX_LIST)
+                    make_cubes("ADD", PARTS_LIST=BOX_LIST);
+                }
+
+              union()
+              {
+                  make_cylinders("BOM", PARTS_LIST=C_LIST)
+                    make_cylinders("REMOVE", PARTS_LIST=C_LIST);
+
+                  make_cubes("BOM", PARTS_LIST=BOX_LIST)
+                    make_cubes("REMOVE", PARTS_LIST=BOX_LIST);
+              }
+            }
+       }
+       // trim ends to make flat
+       // translate([0, 0,  (PIPE_LEN*2/3+ 20.)]) #cube([400,100,10], center=true);
+       // translate([0, 0, -(PIPE_LEN*2/3+ 20)]) #cube([400,100,10], center=true);
+    }
+}
+// -----------------------------------------------
+module make_rings()
+{
+    difference()
     {
         difference()
         {
@@ -53,23 +104,87 @@ difference()
             {
               #make_cylinders(action="BOM", PARTS_LIST=C_LIST)
                 make_cylinders(action="ADD", PARTS_LIST=C_LIST);
-                //
-              make_cubes("BOM", PARTS_LIST=BOX_LIST)
-                make_cubes("ADD", PARTS_LIST=BOX_LIST);
             }
 
           union()
           {
               make_cylinders("BOM", PARTS_LIST=C_LIST)
                 make_cylinders("REMOVE", PARTS_LIST=C_LIST);
-
-              make_cubes("BOM", PARTS_LIST=BOX_LIST)
-                make_cubes("REMOVE", PARTS_LIST=BOX_LIST);
           }
         }
    }
-   // trim ends to make flat
-    translate([0, 0,  (LEN*2/3+ 20.)]) #cube([400,100,10], center=true);
-    translate([0, 0, -(LEN*2/3+ 20)]) #cube([400,100,10], center=true);
+}
+//-------------------------------------------------------
+
+module make_supports()
+{
+    difference()
+    {
+        union()
+        {
+          make_cubes("BOM", PARTS_LIST=SUPPORT_LIST)
+            make_cubes("ADD", PARTS_LIST=SUPPORT_LIST);
+        }
+
+      union()
+      {
+          make_cubes("BOM", PARTS_LIST=SUPPORT_LIST)
+            make_cubes("REMOVE", PARTS_LIST=SUPPORT_LIST);
+      }
+    }
+}
+// -----------------------------------------------
+module make_rings()
+{
+    //ringSupport
+    RING_HEIGHT=10;
+    RING_WIDTH=20;
+       
+    //               WALL                 PIPE_iDIA      WIDE
+    outside =   [ RING_HEIGHT,  // make bigger by this dia
+                  PIPE_iDIA + THICK ,  // sit on outside of pipe
+                  RING_WIDTH/2,   // fatness of ring
+                  [0,0,0], [0,0,0],  DEBUG, DEBUG ];
+                  
+    seat =      [   THICK+.5,
+                    PIPE_iDIA,   // start halfway on pipe dia
+                    RING_WIDTH,
+                    [0,0,RING_WIDTH/2],
+                    [0,0,0],  DEBUG, DEBUG ];
+     
+    OUTER = [ outside];
+    SEAT =  [ seat];
+        translate([0, 0, RING_HEIGHT/2])
+        difference()
+        {
+            union()
+            {
+              make_cylinders(action="BOM", PARTS_LIST=OUTER)
+                make_cylinders(action="ADD", PARTS_LIST=OUTER);
+/*
+                make_cylinders("BOM", PARTS_LIST=SEAT);
+                make_cylinders("ADD", PARTS_LIST=SEAT);
+*/
+            }
+
+          union()
+          {
+              make_cylinders("BOM", PARTS_LIST=OUTER)
+                make_cylinders("REMOVE", PARTS_LIST=OUTER);
+
+if(1)
+{                
+              make_cylinders("BOM", PARTS_LIST=SEAT);
+                make_cylinders("ADD", PARTS_LIST=SEAT);
 }
 
+             #cylinder(h=150, d= PIPE_iDIA, center = true);
+
+          }
+     }
+    
+}
+
+make_drains();
+//make_supports();
+//make_rings();
