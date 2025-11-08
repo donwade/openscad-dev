@@ -4,6 +4,10 @@ $fn = $preview ? 50 : 120;
 
 //            W   D   H   TRANS         ROTATE  btm top               
 cylinder1 = [ +3, 20, 30, [0,0,0], [0,0,0],  0, 1 ]; // dia, len, translate[x,y,z]
+
+// W=0 solid cylinder
+cylinderX = [ 0, 20, 30, [0,40,0], [0,0,0],  0, 1 ]; // dia, len, translate[x,y,z]
+
 //cylinder1 = [ +3, 20, 30, [0,0,0],      [0,0,0],  0, 0 ]; // dia, len, translate[x,y,z]
 cylinder2 = [ -3, 20, 30, [0,40,0],     [0,0,0],  0, 1 ]; // dia, len, translate[x,y,z]
 
@@ -22,10 +26,12 @@ box1 = [  3, [ 10, 20, 30] , [  30, 0, 0 ], [ 0, 0, 0 ],  0, 0];
 box2 = [ -3, [ 10, 20, 30] , [  45, 0, 0 ], [ 0, 0, 0 ],  1, 0];
 box3 = [ -3, [ 10, 20, 30] , [  60, 0, 0 ], [ 0, 0, 0 ],  0, 1];
 box4 = [  3, [ 10, 20, 30] , [   0, 0, 0 ], [ 0, 0, 0 ],  1, 1];
+// thick = 0 make solid
+boxX = [  0, [ 10, 20, 30] , [  45, 0, 0 ], [ 0, 0, 0 ],  1, 0];
 
 
-CYLINDER_LIST =[cylinder1];//, cylinder2];// [cylinder1, cylinder2]; //, cylinder3, cylinder4, cylinder5, cylinder6, cylinder7, cylinder8 ]; 
-BOX_LIST=[];
+CYLINDER_LIST =[cylinder1, cylinderX];//, cylinder2];// [cylinder1, cylinder2]; //, cylinder3, cylinder4, cylinder5, cylinder6, cylinder7, cylinder8 ]; 
+BOX_LIST=[boxX];
 //, box2, box3]; //, box2, box3, box4]; //, box2];
 
 module make_cubes(action, PARTS_LIST)
@@ -93,60 +99,67 @@ module make_cubes(action, PARTS_LIST)
                echo ("remove cube ", item);
 
                 THICK = PARTS_LIST[item][BOX_THICK];
-                GLP1 = [ THICK *2 , THICK*2 , 0];  // z walls done later.
-
-                //thick < 0 dims = outside dimension ... make walls
-                //thick > 0 dims = inside dimension of hole
-                CUBE = PARTS_LIST[item][BOX_DIMS]; 
-               
-                newW = (PARTS_LIST[item][BOX_ENDCAP_L] + PARTS_LIST[item][BOX_ENDCAP_R]) * THICK;
-
-                echo ("item = ", item);
-                echo ("endcapL = ",PARTS_LIST[item][BOX_ENDCAP_L]);
-                echo ("endcapR = ",PARTS_LIST[item][BOX_ENDCAP_R]);
-                echo ("newW = ", newW);
-               
-                // div 2, we are working with centered items.
-                punch = ((PARTS_LIST[item][BOX_ENDCAP_R] - PARTS_LIST[item][BOX_ENDCAP_L]) * THICK);
-                echo ("punch = ", punch);
-
-                // thick>0 wall grows out from DIM 
-                // thick<0 wall grow in from dim. 
-                A_CUBE = (THICK > 0) ? CUBE : CUBE + GLP1;
-                
-                //NEW_CUBE = A_CUBE;
-                NEW_CUBE = [ A_CUBE.x, A_CUBE.y, (punch ==0) ? A_CUBE.z: A_CUBE.z - abs(punch/4)];
-                             
-                echo ("remove: usr dims = ", PARTS_LIST[item][BOX_DIMS]);
-                echo ("remove: final dims = ", NEW_CUBE);   
-                    
-                if ($preview)
+                if (THICK)
                 {
-                    // apply encap walls 
-                    translate ([ 0, 0, -punch/4,]) // remember were on center /2 
+                    GLP1 = [ THICK *2 , THICK*2 , 0];  // z walls done later.
 
-                    // now do user PARTS_LIST
-                    translate( PARTS_LIST[item][BOX_TRANS])
-                    rotate( PARTS_LIST[item][BOX_ROTATE]) // user override
+                    //thick < 0 dims = outside dimension ... make walls
+                    //thick > 0 dims = inside dimension of hole
+                    CUBE = PARTS_LIST[item][BOX_DIMS]; 
+                   
+                    newW = (PARTS_LIST[item][BOX_ENDCAP_L] + PARTS_LIST[item][BOX_ENDCAP_R]) * THICK;
+
+                    echo ("item = ", item);
+                    echo ("endcapL = ",PARTS_LIST[item][BOX_ENDCAP_L]);
+                    echo ("endcapR = ",PARTS_LIST[item][BOX_ENDCAP_R]);
+                    echo ("newW = ", newW);
+                   
+                    // div 2, we are working with centered items.
+                    punch = ((PARTS_LIST[item][BOX_ENDCAP_R] - PARTS_LIST[item][BOX_ENDCAP_L]) * THICK);
+                    echo ("punch = ", punch);
+
+                    // thick>0 wall grows out from DIM 
+                    // thick<0 wall grow in from dim. 
+                    A_CUBE = (THICK > 0) ? CUBE : CUBE + GLP1;
                     
-                    #cube( [NEW_CUBE.x, 
-                            NEW_CUBE.y,
-                            NEW_CUBE.z],
-                           center=true);
+                    //NEW_CUBE = A_CUBE;
+                    NEW_CUBE = [ A_CUBE.x, A_CUBE.y, (punch ==0) ? A_CUBE.z: A_CUBE.z - abs(punch/4)];
+                                 
+                    echo ("remove: usr dims = ", PARTS_LIST[item][BOX_DIMS]);
+                    echo ("remove: final dims = ", NEW_CUBE);   
+                        
+                    if ($preview)
+                    {
+                        // apply encap walls 
+                        translate ([ 0, 0, -punch/4,]) // remember were on center /2 
+
+                        // now do user PARTS_LIST
+                        translate( PARTS_LIST[item][BOX_TRANS])
+                        rotate( PARTS_LIST[item][BOX_ROTATE]) // user override
+                        
+                        #cube( [NEW_CUBE.x, 
+                                NEW_CUBE.y,
+                                NEW_CUBE.z],
+                               center=true);
+                    }
+                    else
+                    {
+                        // apply encap walls 
+                        translate ([ 0, 0, punch/4]) // remember were on center /2 
+
+                        // now do user PARTS_LIST
+                        translate( PARTS_LIST[item][BOX_TRANS])
+                        rotate( PARTS_LIST[item][BOX_ROTATE]) // user override
+                        
+                        cube( [NEW_CUBE.x, 
+                                NEW_CUBE.y,
+                                NEW_CUBE.z],
+                               center=true);
+                    }
                 }
                 else
                 {
-                    // apply encap walls 
-                    translate ([ 0, 0, punch/4]) // remember were on center /2 
-
-                    // now do user PARTS_LIST
-                    translate( PARTS_LIST[item][BOX_TRANS])
-                    rotate( PARTS_LIST[item][BOX_ROTATE]) // user override
-                    
-                    cube( [NEW_CUBE.x, 
-                            NEW_CUBE.y,
-                            NEW_CUBE.z],
-                           center=true);
+                    echo ("THICK=0 object will be solid");
                 }
             }
             echo ("end remove cubes ------------------");
@@ -224,48 +237,55 @@ module make_cylinders(action, PARTS_LIST)
                echo ("remove cylinder -------- #", item);
              
                THICK = PARTS_LIST[item][CYL_THICK];  // diameter speak.
-               
-                echo ("item = ", item);
-                echo ("endcapL = ",PARTS_LIST[item][CYL_ENDCAPL]);
-                echo ("endcapR = ",PARTS_LIST[item][CYL_ENDCAPR]);
-
-               // reduce height when punching by the wall thickness of each endcap
-                height = DEBUG * .01 + PARTS_LIST[item][CYL_HEIGHT]
-                         - (PARTS_LIST[item][CYL_ENDCAPL] + PARTS_LIST[item][CYL_ENDCAPR]) * abs(THICK);
-                echo ("orig H = ", PARTS_LIST[item][CYL_HEIGHT]);
-                echo ("new H = ", height);
-               
-                punch = (PARTS_LIST[item][CYL_ENDCAPL] - PARTS_LIST[item][CYL_ENDCAPR])* THICK/2;
-                echo ("punch = ", punch,"\n");
-             
-
-                echo ("THICK = ", THICK);
-                echo ("DIA = ", PARTS_LIST[item][CYL_DIA]);
-                newDIA = (THICK > 0) ? PARTS_LIST[item][CYL_DIA]: PARTS_LIST[item][CYL_DIA] + THICK*2;
-                echo ("newDIA = ", newDIA);
-                
-                if ($preview)
+               if (THICK)
                 {
-                    // apply encap walls 
-                    translate ([ 0, 0, -punch]) // remember were on center /2 
+                    echo ("item = ", item);
+                    echo ("endcapL = ",PARTS_LIST[item][CYL_ENDCAPL]);
+                    echo ("endcapR = ",PARTS_LIST[item][CYL_ENDCAPR]);
 
-                    // now do user PARTS_LIST
-                    translate( PARTS_LIST[item][CYL_TRANS])
-                    rotate( PARTS_LIST[item][CYL_ROTATE]) // user override
+                   // reduce height when punching by the wall thickness of each endcap
+                    height = DEBUG * .01 + PARTS_LIST[item][CYL_HEIGHT]
+                             - (PARTS_LIST[item][CYL_ENDCAPL] + PARTS_LIST[item][CYL_ENDCAPR]) * abs(THICK);
+                    echo ("orig H = ", PARTS_LIST[item][CYL_HEIGHT]);
+                    echo ("new H = ", height);
+                   
+                    punch = (PARTS_LIST[item][CYL_ENDCAPL] - PARTS_LIST[item][CYL_ENDCAPR])* THICK/2;
+                    echo ("punch = ", punch,"\n");
+                 
+
+                    echo ("THICK = ", THICK);
+                    echo ("DIA = ", PARTS_LIST[item][CYL_DIA]);
+                    newDIA = (THICK > 0) ? PARTS_LIST[item][CYL_DIA]: PARTS_LIST[item][CYL_DIA] + THICK*2;
+                    echo ("newDIA = ", newDIA);
                     
-                    %cylinder( d= newDIA, h = height, center=true);
+                    if ($preview)
+                    {
+                        // apply encap walls 
+                        translate ([ 0, 0, -punch]) // remember were on center /2 
+
+                        // now do user PARTS_LIST
+                        translate( PARTS_LIST[item][CYL_TRANS])
+                        rotate( PARTS_LIST[item][CYL_ROTATE]) // user override
+                        
+                        %cylinder( d= newDIA, h = height, center=true);
+                    }
+                    else
+                    {
+                        // apply encap walls 
+                        translate ([ 0, 0, -punch]) // remember were on center /2 
+
+                        // now do user PARTS_LIST
+                        translate( PARTS_LIST[item][CYL_TRANS])
+                        rotate( PARTS_LIST[item][CYL_ROTATE]) // user override
+                        
+                        cylinder( d= newDIA, h = height, center=true);
+                    }
                 }
                 else
                 {
-                    // apply encap walls 
-                    translate ([ 0, 0, -punch]) // remember were on center /2 
-
-                    // now do user PARTS_LIST
-                    translate( PARTS_LIST[item][CYL_TRANS])
-                    rotate( PARTS_LIST[item][CYL_ROTATE]) // user override
-                    
-                    cylinder( d= newDIA, h = height, center=true);
+                    echo ("THICK = 0 object will be solid");
                 }
+                
             }
             echo ("----- end removing cylinders ------\n");
         }
