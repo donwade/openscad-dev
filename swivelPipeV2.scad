@@ -185,6 +185,27 @@ if(1)
     
 }
 
-make_drains();
+module make_washers()
+{
+             //  T     D   H   TRANS    ROTATE   endcap endcap               
+    button = [ THICK, 4.5, 5, [0,0,0], [0,0,0],  0, 0 ]; // dia, len, translate[x,y,z]
+    BUTTON=[button];
+    
+    for (X = [ 0 : 3])
+    {
+        translate([ X *15, 0, 0])
+        difference()
+        {
+              make_cylinders(action="BOM", PARTS_LIST=BUTTON)
+                make_cylinders(action="ADD", PARTS_LIST=BUTTON);
+
+              make_cylinders("BOM", PARTS_LIST=BUTTON)
+                make_cylinders("REMOVE", PARTS_LIST=BUTTON);
+         }
+    }
+}
+
+//make_drains();
 //make_supports();
 //make_rings();
+make_washers();

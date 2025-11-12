@@ -1,4 +1,6 @@
 use <myTools-extended.scad>
+use <doubleTaperBox.scad>
+
 $fn = $preview ? 50 : 120;
 
 //DEBUG= $preview ? 0 : 1;
@@ -164,22 +166,26 @@ if(1)
 // -----------------------------------------------
 module make_shroud(FAT=.5)
 {
+    PIPE_OD=PIPE_iDIA + 2 * THICK;
+    
     //               WALL                 PIPE_iDIA      WIDE
-    outside =   [ 0,   // make solid
-                  PIPE_iDIA + THICK*2 + 2*RING_HEIGHT,  // sit on outside of pipe
-                  RING_WIDTH*2,   // fatness of ring
+    outside =   [ RING_HEIGHT,   
+                  PIPE_OD + RING_HEIGHT + FAT, // sit on outside of pipe
+                  RING_WIDTH*2,                // fatness of ring
+                  [0,0,0], [0,0,0],  DEBUG, DEBUG ];
+
+    // yes thick/2 is a unknnown tweak.
+    seat =   [    RING_HEIGHT + FAT - THICK/2, // make bigger by this dia
+                  PIPE_OD + FAT,               // sit on outside of pipe
+                  RING_WIDTH + FAT*2,          // punch depth
                   [0,0,0], [0,0,0],  DEBUG, DEBUG ];
                   
-    seat =      [   0,
-                    PIPE_iDIA + THICK*2 + RING_HEIGHT+ FAT*2,   // start halfway on pipe dia
-                    RING_WIDTH + FAT,
-                    [0,0,0],
-                    [0,0,0],  DEBUG, DEBUG ];
-                    
     EAR_SIZE = 20;                
     //       thick     dims           trans       rotate    left, right
     box1 = [  0,    //solid, zero walls 
-            [ PIPE_iDIA + THICK*2 + 2*RING_HEIGHT + EAR_SIZE*2, 20, RING_WIDTH *2] , 
+            [   PIPE_iDIA + THICK*2 + 2*RING_HEIGHT + EAR_SIZE*2.5,
+                20,
+                RING_WIDTH *2], 
             [  0, 0, 0 ], 
             [ 0, 0, 0 ],
             0, 0];
@@ -208,22 +214,58 @@ module make_shroud(FAT=.5)
                 make_cylinders("ADD", PARTS_LIST=INNER);
 
             // crazy glue drip stop
-             rotate([ 90, 0, 0])
-             translate([ PIPE_iDIA/2 + THICK*4  , 0, 0])
-             #cylinder(h=150, d= 3, center = true);
+            {
+                translate([ PIPE_iDIA/2 + THICK*5  , 0, 0])
+                rotate([ 0, 0, 90])
+                #cylinder(h=170, d= 3, center = true);
 
-             rotate([ 90, 0, 0])
-             translate([ -(PIPE_iDIA/2 + THICK*4 ), 0, 0])
-             #cylinder(h=150, d= 3, center = true);
+                translate([ -(PIPE_iDIA/2 + THICK*5 ), 0, 0])
+                rotate([ 0, 0, 90])
+                #cylinder(h=150, d= 3, center = true);
+            }
 
-             cylinder(h=150, d= PIPE_iDIA, center = true);
+            // backup bolt holes
+            {
+                BOLT = 3/16 * 25.4 + FAT;
+                translate([ PIPE_iDIA/2 + THICK*7.5  , 0, 0])
+                rotate([ 0, 90, 90])
+                #cylinder(h=170, d= BOLT, center = true);
 
+                translate([ -(PIPE_iDIA/2 + THICK*7.5 ), 0, 0])
+                rotate([ 0, 90, 90])
+                #cylinder(h=150, d= BOLT, center = true);
+            }
+
+
+            // basic pipe OUTER dia cutout
+             cylinder(h=150, d= PIPE_OD+FAT , center = true);
+            
+            if (0) // transparent view
+            {
+                 translate([0,0,25])
+                 cube([200, 200, 50], center=true);
+            }
           }
      }
     
 }
 
+module make_buttplugs()
+{
+    taper_cube(  big =  [WHITE_W, WHITE_L], 
+                 small= [WHITE_W * .6, WHITE_L *.6], 
+                 height=15, 
+                 indent_pct=20);
+                 
+    translate([0, WHITE_L + 5, 0])
+    taper_cube(  big =  [BLACK_W, BLACK_L], 
+                 small= [BLACK_W * .6, BLACK_L *.6], 
+                 height=15, 
+                 indent_pct=20);
+
+ }
 //make_drains();
 //make_supports();
 //make_rings();
-make_shroud(.5);
+//make_shroud(.5);
+make_buttplugs();
