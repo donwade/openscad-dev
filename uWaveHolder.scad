@@ -1,7 +1,7 @@
 use <myTools.scad>
 $fn=100;
 
-FUDGE = [ .5, .5, 10 ]; // really thick pcb to punch thru the top
+FUDGE = [ 1, 1, 10 ]; // really thick pcb to punch thru the top
 
 WALL=5;
 
@@ -11,7 +11,7 @@ PCB = xPCB + FUDGE;
 GROVE_X= (9 - 5.70)/2; // GROVE conn not on center :P
 
 
-BLOCK = [ 11, 3, 6];
+BLOCK = [ 13, 3, 9];
 
 
 HEIGHT = 25.4;
@@ -36,7 +36,7 @@ module make_box()
         {
             cube(PCB, true);
         
-            translate([ GROVE_X, xPCB.y/2 + BLOCK.y/4 -.5, -8])
+            translate([ GROVE_X, xPCB.y/2 + BLOCK.y/4 , -8])
             #cube(BLOCK, true);
         }
     }
@@ -66,7 +66,7 @@ module make_lid(LID_THICK=2, bHasCable = false)
     }
 }
 //-----------------------------------------------------
-
+make_box();
 //make_lid(LID_THICK=2, bHasCable=false);
 //translate([ 0, 50, 0 ])
-make_lid(LID_THICK=3, bHasCable=true);
+//make_lid(LID_THICK=3, bHasCable=true);

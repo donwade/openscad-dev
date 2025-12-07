@@ -250,18 +250,41 @@ module make_shroud(FAT=.5)
     
 }
 
+/*
+WHITE_W = 80.86 + TWEAK;
+WHITE_L = 57.62 + TWEAK;
+
+BLACK_W = 80.92 + TWEAK;
+BLACK_L = 57.62 + TWEAK;
+
+*/
+
+L_WHITE = 83.84 - 4.11;
+W_WHITE = 59.87 - 4.17;
+echo ("L_WHITE = ", L_WHITE);
+echo ("W_WHITE = ", W_WHITE);
+echo ("");
+
+L_BLACK = 83.20 - 3.98;
+W_BLACK = 60.61 - 4.35;
+echo ("L_BLACK = ", L_BLACK);
+echo ("W_BLACK = ", W_BLACK);
+echo ("");
+
+T=.3;
+
 module make_buttplugs()
 {
-    taper_cube(  big =  [WHITE_W, WHITE_L], 
-                 small= [WHITE_W * .6, WHITE_L *.6], 
-                 height=15, 
-                 indent_pct=20);
+    taper_cube(  big =  [W_WHITE -T , L_WHITE - T], 
+                 small= [W_WHITE * .7, L_WHITE *.7], 
+                 height=20, 
+                 indent_pct=50);
                  
-    translate([0, WHITE_L + 5, 0])
-    taper_cube(  big =  [BLACK_W, BLACK_L], 
-                 small= [BLACK_W * .6, BLACK_L *.6], 
-                 height=15, 
-                 indent_pct=20);
+    translate([0, L_WHITE + 5, 0])
+    taper_cube(  big =  [W_BLACK -T, L_BLACK -T], 
+                 small= [W_BLACK * .7, L_BLACK *.7], 
+                 height=20, 
+                 indent_pct=50);
 
  }
 //make_drains();
