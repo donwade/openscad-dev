@@ -3,14 +3,14 @@ use <myTools.scad>
 punch = $preview ? 2: 0;
 
 // M5 core 2 dimensions
-x = 54.36;
+x = 54.38;
 y = x;
 z = 16.63;
 
 wall = +2;
 
-speaker = [ 28, 10, 5];
-speaker_origin = [ 20, 0, 4.52 + 5]; // measured on outside
+speaker = [ 28, 5, 6];
+speaker_origin = [ 20, -1, 4.52 + 4]; // measured on outside
 
 power = [ 36.33 + 1, 7, 10];
 power_origin = [ 9 , y , 2.56 + wall];
